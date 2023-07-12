@@ -1,12 +1,11 @@
-import numpy as np
-
-from typing import Dict, Tuple, List
-from scipy import spatial
 from collections import defaultdict
+from typing import Dict, List, Tuple
+
+import numpy as np
+from scipy import spatial
 
 
 class SimilarItems:
-
     @staticmethod
     def similarity(embeddings: Dict[int, np.ndarray]) -> Dict[Tuple[int, int], float]:
         """Calculate pairwise similarities between each item
@@ -25,10 +24,10 @@ class SimilarItems:
         pair_sims = {}
         items = list(embeddings.items())
         for i, (k, emb1) in enumerate(items):
-            for j, emb2 in items[i + 1:]:
+            for j, emb2 in items[i + 1 :]:
                 pair_sims[(k, j)] = round(1 - spatial.distance.cosine(emb1, emb2), 8)
         return pair_sims
-    
+
     @staticmethod
     def knn(
         sim: Dict[Tuple[int, int], float], top: int
@@ -51,7 +50,7 @@ class SimilarItems:
             if len(knn_dict[pair[1]]) < top:
                 knn_dict[pair[1]].append((pair[0], score))
         return knn_dict
-    
+
     @staticmethod
     def knn_price(
         knn_dict: Dict[int, List[Tuple[int, float]]],
@@ -71,7 +70,7 @@ class SimilarItems:
         for i, top_n in knn_dict.items():
             weights = np.array([cos_dist + 1 for _, cos_dist in top_n])
             weights_norm = weights / np.sum(weights)
-            price_top_n = np.array([prices[k]  for k, _ in top_n])
+            price_top_n = np.array([prices[k] for k, _ in top_n])
             price = np.sum(price_top_n * weights_norm)
             knn_price_dict[i] = round(price, 2)
 

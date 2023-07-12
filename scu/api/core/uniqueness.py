@@ -1,7 +1,7 @@
-import numpy as np
-
-from typing import Tuple
 from collections import Counter, defaultdict
+from typing import Tuple
+
+import numpy as np
 from sklearn.neighbors import KernelDensity
 
 
@@ -11,9 +11,9 @@ def knn_uniqueness(embeddings: np.ndarray, num_neighbors: int) -> np.ndarray:
     Parameters
     ----------
     embeddings: np.ndarray :
-        embeddings group 
+        embeddings group
     num_neighbors: int :
-        number of neighbors to estimate uniqueness    
+        number of neighbors to estimate uniqueness
 
     Returns
     -------
@@ -41,7 +41,7 @@ def kde_uniqueness(embeddings: np.ndarray) -> np.ndarray:
     Parameters
     ----------
     embeddings: np.ndarray :
-        embeddings group 
+        embeddings group
 
     Returns
     -------
@@ -49,6 +49,6 @@ def kde_uniqueness(embeddings: np.ndarray) -> np.ndarray:
         uniqueness estimates
 
     """
-    kde = KernelDensity(kernel='gaussian').fit(embeddings)
+    kde = KernelDensity(kernel="gaussian").fit(embeddings)
     uniqueness = np.exp(-kde.score_samples(embeddings))
     return uniqueness

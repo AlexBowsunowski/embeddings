@@ -1,7 +1,7 @@
 from typing import Dict
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.sparse import csr_matrix
 
 
@@ -30,33 +30,15 @@ class UserItemMatrix:
         self._user_count = self._sales_data["user_id"].nunique()
         self._item_count = self._sales_data["item_id"].nunique()
 
-        user_idx = np.array(
-            list(
-                set(
-                    self._sales_data['user_id']
-                )
-            )
-        )
+        user_idx = np.array(list(set(self._sales_data["user_id"])))
         user_idx.sort()
-        self._user_map = {
-            item: index 
-            for index, item in enumerate(user_idx)
-        }
+        self._user_map = {item: index for index, item in enumerate(user_idx)}
 
-        item_idx = np.array(
-            list(
-                set(
-                    self._sales_data['item_id']
-                )
-            )
-        )
+        item_idx = np.array(list(set(self._sales_data["item_id"])))
         item_idx.sort()
-        self._item_map = {
-            item: index 
-            for index, item in enumerate(item_idx)
-        }
+        self._item_map = {item: index for index, item in enumerate(item_idx)}
 
-        self._matrix  = csr_matrix((self._user_count, self._item_count))
+        self._matrix = csr_matrix((self._user_count, self._item_count))
 
     @property
     def user_count(self) -> int:

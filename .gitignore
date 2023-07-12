@@ -1,4 +1,4 @@
+*.csv
 *.ipynb*
 .env
 .venv
-*.csv

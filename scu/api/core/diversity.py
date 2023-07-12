@@ -1,7 +1,8 @@
-import numpy as np 
-
 from typing import Tuple
+
+import numpy as np
 from uniqueness import kde_uniqueness
+
 
 def group_diversity(embeddings: np.ndarray, threshold: float) -> Tuple[bool, float]:
     """Calculate group diversity based on kde uniqueness.

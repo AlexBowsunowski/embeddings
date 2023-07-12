@@ -1,6 +1,6 @@
+import os
 from typing import Tuple
 
-import os
 import numpy as np
 import uvicorn
 from fastapi import FastAPI
@@ -10,13 +10,7 @@ from sklearn.neighbors import KernelDensity
 DIVERSITY_THRESHOLD = 10
 
 app = FastAPI()
-embeddings = {
-    1: np.array([-26.57, -76.61, 81.61, -9.11, 74.8, 54.23, 32.56, -22.62, -72.44, -82.78]),
-    2: np.array([-55.98, 82.87, 86.07, 18.71, -18.66, -46.74, -68.18, 60.29, 98.92, -78.95]),
-    3: np.array([-27.97, 25.39, -96.85, 3.51, 95.57, -27.48, -80.27, 8.39, 89.96, -36.68]),
-    4: np.array([-37.0, -49.39, 43.3, 73.36, 29.98, -56.44, -15.91, -56.46, 24.54, 12.43]),
-    5: np.array([-22.71, 4.47, -65.42, 10.11, 98.34, 17.96, -10.77, 2.5, -26.55, 69.16]),
-}
+embeddings = {}
 
 
 def kde_uniqueness(embeddings: np.ndarray) -> np.ndarray:
@@ -34,10 +28,9 @@ def kde_uniqueness(embeddings: np.ndarray) -> np.ndarray:
 
     """
     # Fit a kernel density estimator to the item embedding space
-    kde = KernelDensity(kernel='gaussian').fit(embeddings)
+    kde = KernelDensity(kernel="gaussian").fit(embeddings)
     uniqueness = np.exp(-kde.score_samples(embeddings))
     return uniqueness
-
 
 
 def group_diversity(embeddings: np.ndarray, threshold: float) -> Tuple[bool, float]:
@@ -72,15 +65,13 @@ def uniqueness(item_ids: str) -> dict:
     # Default answer
     item_uniqueness = {item_id: 0.0 for item_id in item_ids}
 
-    
     item_embeddings = kde_uniqueness(
-        np.array(
-            [embeddings[item_id] for item_id in item_ids]
-        )
+        np.array([embeddings[item_id] for item_id in item_ids])
     )
     for i, item_id in enumerate(item_ids):
         item_uniqueness[item_id] = item_embeddings[i]
     return item_uniqueness
+
 
 @app.get("/diversity/")
 def diversity(item_ids: str) -> dict:
@@ -94,10 +85,8 @@ def diversity(item_ids: str) -> dict:
 
     group_emb = np.array([embeddings[item_id] for item_id in item_ids])
     diversity, reject = group_diversity(group_emb, DIVERSITY_THRESHOLD)
-    print(diversity, reject)
     answer["diversity"] = float(diversity)
     answer["reject"] = bool(reject)
-    print(answer)
     return answer
 
 
