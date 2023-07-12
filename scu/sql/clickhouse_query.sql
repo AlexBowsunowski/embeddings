@@ -1,9 +1,29 @@
-SELECT d.item_id, user_id, COUNT(*) AS qty, AVG(mean_global_price) AS price
-FROM default.karpov_express_orders AS d
-JOIN (
-    SELECT item_id, ROUND(AVG(price),2) AS mean_global_price
+WITH k AS 
+(
+    SELECT *
     FROM default.karpov_express_orders
+    WHERE toDate(timestamp) between %(start_date)s AND %(end_date)s
+
+),
+user_item_count_sales AS 
+(
+    SELECT item_id, user_id, SUM(units) as qty 
+    FROM k
+    GROUP BY user_id, item_id
+),
+global_item_prices AS 
+(
+    SELECT item_id, round(avg(price), 2) global_avg_price 
+    FROM k
     GROUP BY item_id
-) AS im ON d.item_id = im.item_id
-WHERE toDate(timestamp) between '2022-10-20' AND '2022-10-23'
-GROUP BY d.item_id, user_id
+)
+
+SELECT 
+    u.item_id,
+    u.user_id,
+    u.qty,
+    g.global_avg_price AS price
+FROM user_item_count_sales AS u
+JOIN global_item_prices AS g 
+USING item_id
+ORDER BY u.user_id, u.item_id;

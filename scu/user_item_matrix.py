@@ -27,29 +27,36 @@ class UserItemMatrix:
         """
         self._sales_data = sales_data.copy()
 
-        self._sales_data = sales_data.copy()
-
         self._user_count = self._sales_data["user_id"].nunique()
         self._item_count = self._sales_data["item_id"].nunique()
 
+        user_idx = np.array(
+            list(
+                set(
+                    self._sales_data['user_id']
+                )
+            )
+        )
+        user_idx.sort()
         self._user_map = {
             item: index 
-            for index, item in enumerate(
-                np.array(
-                    sales_data.sort_values(by="user_id")['user_id']
-                )
-            )
-        }
-        self._item_map = {
-            item: index 
-            for index, item in enumerate(
-                np.array(
-                    sales_data.sort_values(by="item_id")['item_id']
-                )
-            )
+            for index, item in enumerate(user_idx)
         }
 
-        self._matrix = None
+        item_idx = np.array(
+            list(
+                set(
+                    self._sales_data['item_id']
+                )
+            )
+        )
+        item_idx.sort()
+        self._item_map = {
+            item: index 
+            for index, item in enumerate(item_idx)
+        }
+
+        self._matrix  = csr_matrix((self._user_count, self._item_count))
 
     @property
     def user_count(self) -> int:
@@ -121,4 +128,9 @@ class UserItemMatrix:
         Returns:
             csr_matrix: CSR matrix
         """
+        for row in self._sales_data.values:
+            user_id, item_id, qty, prices = row
+            user_row = self._user_map[user_id]
+            item_col = self._item_map[item_id]
+            self._matrix[user_row, item_col] = qty
         return self._matrix
